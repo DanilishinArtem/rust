@@ -72,4 +72,75 @@ let absent_number: Option<i32> = None;
 ```
 If we use None instead of `Some`, then we need to specify which type of `Option<T>` we have, because the compiler cannot logically deduce the type that Some option will contain only from the value `None`.
 ## The `match` expression as a flow control statement
-139
+Example of Enumeration and the match expression, which contains enumeration options as patterns.
+```rust
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter,
+}
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => {
+            println!("This coin");
+            1
+        },
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter => 25,
+    }
+}
+```
+## Patterns that bind to values
+If `Coin::Quarter` matches, the `state` variable will be bound to the state value of that quarter.
+```rust
+enum UsState {
+    Alabama,
+    Alaska,
+    // --Something else--
+}
+enum Coin {
+    Penny,
+    Nickel,
+    Dime,
+    Quarter(UsState),
+}
+fn value_in_cents(coin: Coin) -> u8 {
+    match coin {
+        Coin::Penny => 1,
+        Coin::Nickel => 5,
+        Coin::Dime => 10,
+        Coin::Quarter(state) => {
+            println!("Четвертак из штата {:?}!", state);
+            25
+        },
+    }
+}
+```
+## Comparison with Option<Т>
+You can handle `Option<Т>` using the `match` expression, just as it was with the Coin enumeration! Instead of comparing coins, we will compare the options of the `Option<Т>` enumeration, but the nature of the `match` expression will remain the same.
+```rust
+fn plus_one(x: Option<i32>) -> Option<i32> {
+    match x {
+        None => None,
+        Some(i) => Some(i + 1),
+    }
+}
+let five = Some(5);
+let six = plus_one(five);
+let none = plus_one(None); 
+```
+The value of `Some(5)` does not match the `None` pattern, so we move on to the next sleeve. Is `Some(5)` the same as `Some(i)`? Of course, yes!
+## Placeholder
+```rust
+let some_u8_value = 0u8;
+match some_u8_value {
+    1 => println!("один"),
+    3 => println!("три"),
+    5 => println!("пять"),
+    7 => println!("семь"),
+    _ => (),
+}
+```
+The `_` pattern will match any value. If you put it after the other sleeves, `_` will match all possible cases that are not specified before it. `()` is just an empty value, so nothing will happen in the case of `_`.
