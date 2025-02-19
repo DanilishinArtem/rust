@@ -1,13 +1,17 @@
-use std::fs::File;
-fn main() {
-    let f = File::open("hello.txt");
-    match f {
-        Ok(file) => {
-            println!("File opened successfully");
-            file
-        },
-        Err(error) => {
-            panic!("Froblems opening the file: {:?}", error)
-        },
-    };
+pub struct Guess {
+    value: i32,
 }
+impl Guess {
+    pub fn new(value: i32) -> Guess {
+        if value < 1 || value > 100 {
+            panic!("Значение догадки должно быть между 1 и 100, получено {}.", value);
+        }
+        Guess {
+            value
+        }
+    }
+    pub fn value(&self) -> i32 {
+        self.value
+    }
+}
+
