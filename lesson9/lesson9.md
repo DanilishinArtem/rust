@@ -123,3 +123,4 @@ fn main() {
 ```
 Since `Rust` compiles `generalized code` into code that specifies the type in each instance, it does not affect the execution time due to the use of generalizations.
 ## Types: defining collaborative behavior
+223
