@@ -1,22 +1,19 @@
-pub struct Guess {
-    value: i32,
-}
-impl Guess {
-    pub fn new(value: i32) -> Guess {
-        if value < 1 || value > 100 {
-            panic!("Значение догадки должно быть между 1 и 100, получено {}.", value);
-        }
-        Guess {
-            value
-        }
-    }
+pub fn add_two(a: i32) -> i32 {
+    a + 2
 }
 #[cfg(test)]
 mod tests {
     use super::*;
     #[test]
-    #[should_panic]
-    fn greater_than_100() {
-        Guess::new(200);
+    fn add_two_and_two() {
+        assert_eq!(4, add_two(2));
+    }
+    #[test]
+    fn add_three_and_two() {
+        assert_eq!(5, add_two(3));
+    }
+    #[test]
+    fn one_hundred() {
+        assert_eq!(102, add_two(100));
     }
 }

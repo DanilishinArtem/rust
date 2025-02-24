@@ -75,8 +75,10 @@ pub struct Guess {
 }
 impl Guess {
     pub fn new(value: i32) -> Guess {
-        if value < 1 || value > 100 {
-            panic!("Значение догадки должно быть между 1 и 100, получено {}.", value);
+        if value < 1  {
+            panic!("Value of guess should be more then 1, got {}", value);
+        } else if value > 100 {
+            panic!("Value of guess should be less then 100, got {}", value);
         }
         Guess {
             value
@@ -87,10 +89,89 @@ impl Guess {
 mod tests {
     use super::*;
     #[test]
-    #[should_panic]
+    #[should_panic(expected = "Value of guess should be between 1 and 100.")]
     fn greater_than_100() {
         Guess::new(200);
     }
 }
 ```
-262
+## Using the Result<Т, E> type in tests
+```rust
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn it_works() -> Result<(), String> {
+        if 2 + 2 == 4 {
+            Ok(())
+        } else {
+            Err(String::from("2 + 2 is not equal 4"))
+        }
+    }
+}
+```
+When you run multiple tests, by default they run in parallel using threads of execution. This means that the tests will complete faster, making it easier for you to get feedback on whether the code is working. Since the tests are running simultaneously, make sure that they do not depend on each other or on any shared state, including the shared environment, such as the current working directory or environment variables.
+If you do not want to run the tests in parallel or want to more precisely control the number of execution threads used, you can send the --testthreads flag and the number of execution threads you want to use to the test binary file.
+`
+cargo test -- --test-threads=1
+`
+## Showing the results of the function
+```rust
+fn prints_and_returns_10(a: i32) -> i32 {
+    println!("I've got value {}", a);
+    10
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn this_test_will_pass() {
+        let value = prints_and_returns_10(4);
+        assert_eq!(10, value);
+    }
+    #[test]
+    fn this_test_will_fail() {
+        let value = prints_and_returns_10(8);
+        assert_eq!(5, value);
+    }
+}
+```
+If we run `cargo test` then we'll get in result calling this line `let value = prints_and_returns_10(4);` and message `I've got value 8`, but if we run `cargo test --nocapture` tnen we'll get both lines `I've got value 4` and `I've got value 8`.
+## Running a subset of tests by name
+Sometimes it takes a long time to run a complete set of tests. If you are working with code in a specific area, you may need to perform only those tests that relate to that code. You can select the tests to be performed by giving the cargo test command the name or names of the tests you want to run.
+```rust
+pub fn add_two(a: i32) -> i32 {
+    a + 2
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn add_two_and_two() {
+        assert_eq!(4, add_two(2));
+    }
+    #[test]
+    fn add_three_and_two() {
+        assert_eq!(5, add_two(3));
+    }
+    #[test]
+    fn one_hundred() {
+        assert_eq!(102, add_two(100));
+    }
+}
+```
+Result of the command `cargo test` is:
+```
+running 3 tests
+test tests::add_three_and_two ... ok
+test tests::add_two_and_two ... ok
+test tests::one_hundred ... ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+```
+Result of the command `cargo test one_hundred` is:
+```
+running 1 test
+test tests::one_hundred ... ok
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.00s
+```
+## Filtering in order to perform multiple tests
+270
