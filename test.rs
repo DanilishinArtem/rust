@@ -1,25 +1,11 @@
-use std::fmt::Display;
-struct Pair<T> {
-    x: T,
-    y: T,
+pub fn add_two(a: i32) -> i32 {
+    a + 2
 }
-impl<T> Pair<T> {
-    fn new(x: T, y: T) -> Self {
-        Self {
-            x,
-            y,
-        }
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn it_adds_two() {
+        assert_eq!(4, add_two(2));
     }
-}
-impl<T: Display + PartialOrd> Pair<T> {
-    fn cmp_display(&self) {
-        if self.x >= self.y {
-            println!("The largest term x is equal to {}", self.x);
-        } else {
-            println!("The largest term y is equal to {}", self.y);
-        }
-    }
-}
-fn main(){
-
 }

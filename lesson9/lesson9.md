@@ -7,7 +7,7 @@ fn main() {
     let number_list = vec![34, 50, 25, 100, 65];
     let mut largest = number_list[0];
     for number in number_list {
-        if number > largest {
+        if number > largest {◊
             largest = number;
         }
     }
@@ -281,4 +281,35 @@ fn longest<'a>(x: &'a str, y: &'a str) -> &'a str {
 }
 ```
 ## Thinking in terms of life cycles
-242
+```rust
+struct ImportantExcerpt<'a> {
+    part: &'a str,
+}
+fn main() {
+    let novel = String::from("Зовите меня Измаил. Несколько лет тому назад...");
+    let first_sentence = novel.split('.')
+        .next()
+        .expect("Не смог отыскать '.'");
+    let i = ImportantExcerpt { part: first_sentence };
+}
+```
+This structure has one `part` field, which contains a string slice, that is, a link. As with generalized data types, we declare the name of the generalized lifecycle parameter in angle brackets after the structure name, so we can use the lifecycle parameter in the body of the structure definition. This annotation means that the `ImportantExcerpt` instance cannot survive the reference it contains in the part `field`.
+
+## Description of lifecycle rules:
+To find out what life cycles links have when there are no explicitly defined annotations, the compiler uses three rules. The first rule applies to input life cycles, while the second and third apply to outputs. If the compiler reaches the end of these three rules and there are still references for which it cannot figure out the lifecycle, the compiler will stop with an error. These rules apply to the definitions of `fn` as well as to the blocks of `impl'.
+- The first rule is that each parameter that is a reference gets its own lifecycle parameter. In other words, a function with one parameter gets one lifecycle parameter, a function with two parameters gets two separate lifecycle parameters: 
+```rust
+fn foo<'a>(x: &'a i32); 
+fn foo<'a, 'b>(x: &'a i32, y: &'b i32)
+```
+- The second rule is that if there is exactly one input lifecycle parameter, then this lifecycle parameter is assigned to all output lifecycle parameters.:
+```rust
+fn foo<'a>(x: &'a i32) -> &'a i32
+```
+- The third rule is that if there are several input lifecycle parameters, but one of them is `&self` or `&mut self`, since this is a method, then the lifecycle of the self parameter is assigned to all output lifecycle parameters. This third rule makes the methods much more convenient to read and write, since fewer characters are required.
+## Static lifecycle
+We need to discuss one special lifecycle, `'static`, which means the entire duration of the program. All string literals have a `'static` lifecycle, which we denote as follows:
+```rust
+let s: &'static str = "I have a static lifecycle.";
+```
+The text of this string value is stored directly in the program's binary file, which is always available. Therefore, the lifecycle of all string literals is `'static`.
